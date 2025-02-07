@@ -1,0 +1,32 @@
+services:
+    alpha-postgres-db:
+        container_name: alpha-postgres-db
+        image: postgres:17-alpine
+        ports:
+            - "5432:5432"
+        env_file:
+            - ./server/.env.local
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+    alpha-django-api:
+        container_name: alpha-django-api
+        build: ./server
+        ports:
+            - "8000:8000"
+        env_file:
+            - ./server/.env.local
+        depends_on:
+            - alpha-postgres-db
+    alpha-react-web:
+        container_name: alpha-react-web
+        build: ./client
+        ports:
+            - "3000:3000"
+        env_file:
+            - ./client/.env.local
+        depends_on:
+            - alpha-django-api
+        volumes:
+            - ./client/src:/app/src
+volumes:
+    postgres_data:

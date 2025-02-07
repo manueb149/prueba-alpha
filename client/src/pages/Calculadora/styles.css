@@ -1,0 +1,10 @@
+section#calculadora-section {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+	form#calculadora-form {
+		max-width: 300px;
+	}
+}

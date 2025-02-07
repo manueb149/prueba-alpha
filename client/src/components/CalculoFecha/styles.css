@@ -1,0 +1,19 @@
+.modal-body-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+p.modal-body {
+	font-size: 18px;
+	font-weight: 600;
+	margin-bottom: 5px;
+	text-align: center;
+	strong {
+		display: block;
+		font-size: 18px;
+		font-weight: 300;
+		text-align: center;
+	}
+}
