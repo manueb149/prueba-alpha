@@ -30,18 +30,16 @@ class CaculadoraFecha:
 
     @property
     def __fecha_inicio(self):
-        # sumar días en función de horario operativo
-        nueva_fecha = self.fecha_creacion + self.__dias_a_sumar
+        dias_a_sumar = self.__dias_a_sumar.days
+        nueva_fecha = self.fecha_creacion
 
         es_laborable = self.__es_laborable(nueva_fecha)
         es_feriado = self.__es_feriado(nueva_fecha)
 
-        # revisar si la nueva fecha es no es laborable, de no serlo, la movemos a un lunes
-        if not es_laborable or es_feriado:
-            nueva_fecha = self.__mover_a_dia_laborable(
-                es_laborable, es_feriado, nueva_fecha
-            )
-
+        # Iterar hasta encontrar una fecha laborable
+        nueva_fecha = self.__mover_dia_inicio(
+            es_laborable, es_feriado, nueva_fecha, dias_a_sumar
+        )
         # cambiar el tiempo a 00:00:00
         nueva_fecha = datetime.strftime(nueva_fecha, "%Y-%m-%d 00:00:00")
         nueva_fecha = datetime.strptime(nueva_fecha, "%Y-%m-%d %H:%M:%S")
@@ -55,11 +53,9 @@ class CaculadoraFecha:
         es_laborable = self.__es_laborable(nueva_fecha)
         es_feriado = self.__es_feriado(nueva_fecha)
 
-        # revisar si la nueva fecha es no es laborable, de no serlo, la movemos a un lunes
+        # revisar si la nueva fecha es no es laborable
         if not es_laborable or es_feriado:
-            nueva_fecha = self.__mover_a_dia_laborable(
-                es_laborable, es_feriado, nueva_fecha
-            )
+            nueva_fecha = self.__mover_dia_fin(es_laborable, es_feriado, nueva_fecha)
 
         # cambiar el tiempo a 00:00:00
         nueva_fecha = datetime.strftime(nueva_fecha, "%Y-%m-%d 00:00:00")
@@ -113,9 +109,20 @@ class CaculadoraFecha:
         except:
             raise Exception("Error al comparar los días feriados.")
 
-    def __mover_a_dia_laborable(self, es_laborable, es_feriado, nueva_fecha):
+    def __mover_dia_fin(self, es_laborable, es_feriado, nueva_fecha):
         while not es_laborable or es_feriado:
             nueva_fecha += timedelta(days=1)
             es_laborable = self.__es_laborable(nueva_fecha)
             es_feriado = self.__es_feriado(nueva_fecha)
+        return nueva_fecha
+
+    def __mover_dia_inicio(self, es_laborable, es_feriado, nueva_fecha, dias_a_sumar):
+        while not es_laborable or es_feriado or dias_a_sumar > 0:
+            nueva_fecha += timedelta(days=1)
+            es_laborable = self.__es_laborable(nueva_fecha)
+            es_feriado = self.__es_feriado(nueva_fecha)
+
+            # Validamos si el dia es laborable, para asi sumar los dias pertinentes
+            if es_laborable and not es_feriado:
+                dias_a_sumar -= 1
         return nueva_fecha
